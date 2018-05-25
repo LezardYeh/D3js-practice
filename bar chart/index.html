@@ -50,7 +50,6 @@
       .attr('height', d => yLiner(d))
       .style('fill', d => d > 30 ? 'red' : '#CCC');
 
-
     svg.selectAll('text').data(data).enter().append('text')
       .text(a => a)
       .attr('x', (d, i) => i * barWidth + screen.padding)
@@ -59,13 +58,13 @@
       .attr("dx", xLiner.bandwidth() / 2)
       .attr("text-anchor", "middle");
 
-
     svg.append('g').attr("transform", "translate(" + screen.padding + "," + screen.padding + ")")
       .call(d3.axisLeft(_yLiner));
 
     svg.append('g').attr('y', screen.height).attr("class", "axis")
       .attr("transform", "translate(" + screen.padding + "," + (screen.height + screen.padding) + ")")
       .call(xAxis);
+      
   </script>
 </body>
 
