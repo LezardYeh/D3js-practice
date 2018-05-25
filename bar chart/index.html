@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>JS Bin</title>
+</head>
+
+<body>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+
+  <script>
+    var data = [10, 20, 10, 40, 31, 23, 12, 5];
+
+    var screen = {
+      width: 500,
+      height: 300,
+      padding: 40
+    };
+
+    var barWidth = screen.width / data.length;
+
+    var max = d3.max(data),
+      min = d3.min(data);
+
+    var yLiner = d3.scaleLinear()
+      .domain([0, max])
+      .range([0, screen.height]);
+    var _yLiner = d3.scaleLinear()
+      .domain([0, max])
+      .range([screen.height, 0]);
+    var xLiner = d3.scaleBand()
+      .domain(data.map((d, i) => 'No.' + i))
+      .range([0, screen.width]);
+
+    var yAxis = d3.axisLeft(yLiner);
+    var xAxis = d3.axisBottom(xLiner);
+
+    var svg = d3.select('body')
+      .append('svg')
+      .attr('width', xLiner(data.length) + screen.padding * 2)
+      .attr('height', yLiner(max) + screen.padding * 2);
+
+    svg.selectAll('rect').data(data).enter()
+      .append('rect')
+      .attr('x', (d, i) => i * barWidth + screen.padding)
+      .attr('y', d => yLiner(max - d) + screen.padding)
+      .attr('width', d => barWidth - 3)
+      .attr('height', d => yLiner(d))
+      .style('fill', d => d > 30 ? 'red' : '#CCC');
+
+
+    svg.selectAll('text').data(data).enter().append('text')
+      .text(a => a)
+      .attr('x', (d, i) => i * barWidth + screen.padding)
+      .attr('y', d => screen.height - yLiner(d) + screen.padding)
+      .attr("dy", "1em")
+      .attr("dx", xLiner.bandwidth() / 2)
+      .attr("text-anchor", "middle");
+
+
+    svg.append('g').attr("transform", "translate(" + screen.padding + "," + screen.padding + ")")
+      .call(d3.axisLeft(_yLiner));
+
+    svg.append('g').attr('y', screen.height).attr("class", "axis")
+      .attr("transform", "translate(" + screen.padding + "," + (screen.height + screen.padding) + ")")
+      .call(xAxis);
+  </script>
+</body>
+
+</html>
