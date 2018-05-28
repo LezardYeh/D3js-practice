@@ -5,6 +5,7 @@
 - 條圖數值置中顯示
 - Y軸刻度反轉顯示
 - 可顯示負數值
+- 動畫效果
 - [DEMO](https://htmlpreview.github.io/?https://github.com/LezardYeh/D3js-practice/blob/master/1.bar-chart/index.html)
 
 # 待改進
