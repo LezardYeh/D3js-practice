@@ -1,0 +1,57 @@
+<html>
+
+<head>
+
+</head>
+
+<body>
+        <svg width="600" height="600"></svg>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script>
+        var data = [
+
+            { companyId: 'CFTW', month: 1, score: 40 },
+            { companyId: 'CEOF', month: 1, score: 50 },
+            { companyId: 'GLKTH', month: 1, score: 200 },
+
+            { companyId: 'CFTW', month: 2, score: 90 },
+            { companyId: 'CEOF', month: 2, score: 20 },
+            { companyId: 'GLKTH', month: 2, score: 80 },
+        ],
+            width = 250,
+            height = 500,
+            scoreList = data.map((d) => d.score),
+            max = d3.max(scoreList),
+            min = d3.min(scoreList),
+            color = d3.scaleOrdinal(d3.schemeCategory10).domain(d=>d.companyId);
+
+        var y = d3.scaleLinear().rangeRound([height, 0]).domain([min, max]);
+        var x = d3.scaleBand().rangeRound([0, width]).domain(data.map(d => d.month));
+        var bu = d3.scaleBand().rangeRound([0, x.bandwidth()]).domain(data.map(d => d.companyId));
+        var svg = d3.select('body')
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height);
+        var groups = svg.selectAll('g')
+            .data(data)
+            .enter()
+            .append('g')
+            .attr('transform', d =>{ 
+                return 'translate(' + x(d.month) + ',0)' } );
+        var bars = groups.selectAll(null)
+        .data(d=>[d])
+            .enter()
+            .append('rect')
+            .attr('score',d=>{ 
+                console.log(d);
+                return d.score;})
+            .attr('x',(d,i)=>bu(d.companyId))
+            .attr('y',(d,i)=>y(d.score))
+            .attr('width',5)
+            .attr('height',(d)=>height-y(d.score))
+            .attr('fill',d=>color(d.companyId))
+
+    </script>
+</body>
+
+</html>
