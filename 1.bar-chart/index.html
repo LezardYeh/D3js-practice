@@ -25,7 +25,7 @@
     //比例尺
     var yLiner = d3.scaleLinear()
       .domain([min > 0 ? 0 : min, max])
-      .range([screen.height,0]);
+      .range([screen.height, 0]);
     var xLiner = d3.scaleBand()
       .domain(data.map((d, i) => 'No.' + i))
       .range([0, screen.width]);
@@ -40,13 +40,13 @@
     svg.selectAll('rect').data(data).enter()
       .append('rect')
       .attr('x', (d, i) => i * barWidth + screen.padding + screen.innterPadding)
-      .attr('y', (d) => yLiner(0) + screen.padding )
+      .attr('y', (d) => yLiner(0) + screen.padding)
       .attr('width', d => barWidth - 3)
       .style('fill', d => d < 0 ? 'red' : '#CCC')
       .transition()
       .duration(1500)
-      .attr('height', d => Math.abs(yLiner(d) - yLiner(0)) )
-      .attr('y', (d) => yLiner(d) + (d > 0?screen.padding:-screen.padding));
+      .attr('height', d => Math.abs(yLiner(d) - yLiner(0)))
+      .attr('y', (d) => yLiner(d) + (d > 0 ? screen.padding : -screen.padding));
 
     //加上Value的文字
     svg.selectAll('text').data(data).enter().append('text')
@@ -55,10 +55,10 @@
       .attr("dy", "1em")
       .attr("dx", xLiner.bandwidth() / 2)
       .attr("text-anchor", "middle")
-      .attr('y', (d) => yLiner(0) + screen.padding )      
+      .attr('y', (d) => yLiner(0) + screen.padding)
       .transition()
       .duration(1500)
-      .attr('y', d =>yLiner(d) + (d > 0 ? screen.padding : 0))      ;
+      .attr('y', d => yLiner(d) + (d > 0 ? screen.padding : 0));
 
     //軸線
     svg.append('g').attr("transform", "translate(" + screen.padding + "," + screen.padding + ")")
