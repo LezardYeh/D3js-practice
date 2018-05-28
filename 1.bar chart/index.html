@@ -11,12 +11,13 @@
   <script src="https://d3js.org/d3.v5.min.js"></script>
 
   <script>
-    var data = [10, 20, 10, 40, 31, 23, 12, 5];
+    var data = [10, 10, 20, 33.5, 20, 50.5, 10, 5, 12, 5];
 
     var screen = {
-      width: 500,
-      height: 300,
-      padding: 40
+      width: 400,
+      height: 200,
+      padding: 40,
+      innterPadding: 10 //條圖內容與刻度間的距離，純粹讓顯示更好看
     };
 
     var barWidth = screen.width / data.length;
@@ -25,10 +26,10 @@
       min = d3.min(data);
 
     var yLiner = d3.scaleLinear()
-      .domain([0, max])
+      .domain([min > 0 ? 0 : min, max])
       .range([0, screen.height]);
     var _yLiner = d3.scaleLinear()
-      .domain([0, max])
+      .domain([min > 0 ? 0 : min, max])
       .range([screen.height, 0]);
     var xLiner = d3.scaleBand()
       .domain(data.map((d, i) => 'No.' + i))
@@ -39,21 +40,29 @@
 
     var svg = d3.select('body')
       .append('svg')
-      .attr('width', xLiner(data.length) + screen.padding * 2)
+      .attr('width', (data.length) * barWidth + screen.padding * 2)
       .attr('height', yLiner(max) + screen.padding * 2);
 
     svg.selectAll('rect').data(data).enter()
       .append('rect')
-      .attr('x', (d, i) => i * barWidth + screen.padding)
-      .attr('y', d => yLiner(max - d) + screen.padding)
+      .attr('x', (d, i) => i * barWidth + screen.padding + screen.innterPadding)
+      .attr('y', (d) => {
+        if (d > 0) {
+          return yLiner(max) - yLiner(d) + screen.padding;
+        } else {
+          return yLiner(max) - yLiner(0) + screen.padding; //注意反轉邏輯
+        };
+      })
       .attr('width', d => barWidth - 3)
-      .attr('height', d => yLiner(d))
-      .style('fill', d => d > 30 ? 'red' : '#CCC');
+      .attr('height', d => {
+        return Math.abs(yLiner(d) - yLiner(0))
+      })
+      .style('fill', d => d < 0 ? 'red' : '#CCC');
 
     svg.selectAll('text').data(data).enter().append('text')
       .text(a => a)
-      .attr('x', (d, i) => i * barWidth + screen.padding)
-      .attr('y', d => screen.height - yLiner(d) + screen.padding)
+      .attr('x', (d, i) => i * barWidth + screen.padding + screen.innterPadding)
+      .attr('y', d => screen.height - yLiner(d) + (d > 0 ? screen.padding : 0))
       .attr("dy", "1em")
       .attr("dx", xLiner.bandwidth() / 2)
       .attr("text-anchor", "middle");
@@ -61,10 +70,9 @@
     svg.append('g').attr("transform", "translate(" + screen.padding + "," + screen.padding + ")")
       .call(d3.axisLeft(_yLiner));
 
-    svg.append('g').attr('y', screen.height).attr("class", "axis")
-      .attr("transform", "translate(" + screen.padding + "," + (screen.height + screen.padding) + ")")
+    svg.append('g').attr("transform", "translate(" + (screen.padding + screen.innterPadding) + "," + (screen.height + screen.padding + screen.innterPadding) + ")")
       .call(xAxis);
-      
+
   </script>
 </body>
 
