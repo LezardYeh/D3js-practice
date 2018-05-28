@@ -4,7 +4,7 @@
 - 比例尺應用
 - 條圖數值置中顯示
 - Y軸刻度反轉顯示
-- 負數值
+- 可顯示負數值
 - [DEMO](https://htmlpreview.github.io/?https://github.com/LezardYeh/D3js-practice/blob/master/1.bar%20chart/index.html)
 
 # 待改進
@@ -13,7 +13,7 @@
 
 # 下階段實作
 - 群組長條圖
-- 用運更生動的效果
+- 運用更生動的效果
 
 
 
