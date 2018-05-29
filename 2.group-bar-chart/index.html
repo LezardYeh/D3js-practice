@@ -5,54 +5,111 @@
 </head>
 
 <body>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
     <script>
         var data = [
+            { companyId: 'CFTW', month: 'JUN', score: 40 },
+            { companyId: 'CEOF', month: 'JUN', score: 50 },
+            { companyId: 'GLKTH', month: 'JUN', score: 200 },
 
-            { companyId: 'CFTW', month: 1, score: 40 },
-            { companyId: 'CEOF', month: 1, score: 50 },
-            { companyId: 'GLKTH', month: 1, score: 200 },
+            { companyId: 'GLKTH', month: 'JUL', score: 80 },
+            { companyId: 'CEOF', month: 'JUL', score: 20 },
+            { companyId: 'CFTW', month: 'JUL', score: 90 },
+            { companyId: 'CFMT', month: 'JUL', score: 90 },
 
-            { companyId: 'GLKTH', month: 2, score: 80 },
-            { companyId: 'CEOF', month: 2, score: 20 },
-            { companyId: 'CFTW', month: 2, score: 90 },
-            
+            { companyId: 'GLKTH', month: 'AUG', score: 40 },
+            { companyId: 'CEOF', month: 'AUG', score: 20.5 },
+            { companyId: 'CFTW', month: 'AUG', score: 75 },
+            { companyId: 'CFMT', month: 'AUG', score: 55 }
+
         ],
-            width = 250,
-            height = 500,
+            width = 1000,
+            height = 250,
+            margin = 30,
             scoreList = data.map((d) => d.score),
             max = d3.max(scoreList),
             min = d3.min(scoreList),
-            color = d3.scaleOrdinal(d3.schemeCategory10).domain(d=>d.companyId);
+            color = d3.scaleOrdinal(d3.schemeDark2).domain(d => d.companyId);
 
+        //比例尺
         var y = d3.scaleLinear().rangeRound([height, 0]).domain([0, max]);
         var x = d3.scaleBand().rangeRound([0, width]).domain(data.map(d => d.month)).padding(0.3);
-        var bu = d3.scaleBand().rangeRound([0, x.bandwidth()]).domain(data.map(d => d.companyId)).padding(0.05);
+        var companyScale = d3.scaleBand().rangeRound([0, x.bandwidth()]).domain(data.map(d => d.companyId)).padding(0.05);
+
+        //繪製區
         var svg = d3.select('body')
             .append('svg')
-            .attr('width', width)
-            .attr('height', height);
-        var groups = svg.selectAll('g')
+            .attr('width', width + 2 * margin)
+            .attr('height', height + 2 * margin);
+        var g = svg.append('g').attr('transform', `translate(${margin},${margin})`); //主顯示區，可簡化各種邊界位置計算
+
+        //依照月份產生群組區域
+        var groups = g.selectAll('g')
             .data(data)
             .enter()
             .append('g')
-            .attr('transform', d =>{ 
-                return 'translate(' + x(d.month) + ',0)' } );
-        var bars = groups.selectAll(null)
-        .data(d=>[d])
+            .attr('transform', d => `translate(${x(d.month)},0)`);
+
+        //畫矩形
+        groups.selectAll(null)
+            .data(d => [d])
             .enter()
             .append('rect')
-            .attr('score',d=>{ 
-                // debugger;
-                console.log(d);
-                return d.score;})
-            .attr('x',(d,i)=>bu(d.companyId))
-            .attr('y',(d,i)=>y(d.score))
-            .attr('width',bu.bandwidth())
-            .attr('height',(d)=>{
-                debugger;
-                return height-y(d.score)})
-            .attr('fill',d=>color(d.companyId))
+            .attr('score', d => d.score)
+            .attr('x', (d, i) => companyScale(d.companyId))
+            .attr('y', (d, i) => y(d.score))
+            .attr('width', companyScale.bandwidth())
+            .attr('height', (d) => height - y(d.score))
+            .attr('fill', d => color(d.companyId));
+
+        //數值
+        groups.selectAll('text')
+            .data(d => [d])
+            .enter()
+            .append('text')
+            .text(d => d).attr("font-size", 10)
+            .attr('y', d => y(d.score) + 15)
+            .attr('x', d => companyScale(d.companyId))
+            .attr("dx", companyScale.bandwidth() / 2)
+            .text(d => d.score)
+            .attr("text-anchor", "middle");
+
+        //Company標示
+        var companyArea = g.selectAll('g.company')
+            .data(data.map(d => d.companyId)
+                .filter((value, index, self) => self.indexOf(value) === index
+                ))
+            .enter()
+            .append('g').attr('class', 'company')
+            .attr('transform', (d, i) => `translate(${width},${i * 20})`);
+
+        //Company標示-文字
+        companyArea.selectAll('text.company')
+            .data(d => [d])
+            .enter()
+            .append('text').attr('class', 'company')
+            .text(d => d).attr("font-size", 10)
+            .attr("text-anchor", "end");
+
+        //Company標示-方格
+        companyArea.selectAll('rect.company')
+            .data(d => [d])
+            .enter()
+            .append('rect').attr('class', 'company')
+            .attr('x', 5).attr('y', -10)
+            .attr('width', 15)
+            .attr('height', 15)
+            .attr('fill', color);
+
+        //X軸
+        g.append('g')
+            .attr('transform', `translate(0,${height})`)
+            .call(d3.axisBottom(x));
+
+        //Y軸
+        g.append('g')
+            .attr('transform', `translate(0,0)`)
+            .call(d3.axisLeft(y));
 
     </script>
 </body>
