@@ -11,59 +11,59 @@
   <script src="https://d3js.org/d3.v5.min.js"></script>
 
   <script>
-    var data = [10, 10, 20, 33.5, -20, 50.5, 10, 5, 12, 5]
-      , screen = {
-        width: 600,
-        height: 300,
-        padding: 40,
-        innterPadding: 10 //條圖內容與刻度間的距離，純粹讓顯示更好看
-      },
-      barWidth = screen.width / data.length,
+    var data = [10, 10, 20, 33.5, 50, -10.5, 10, 5, 12,2]
+    margin = 40,
+      width = 500,
+      height = 300,
+      barWidth = width / data.length,
       max = d3.max(data),
       min = d3.min(data);
 
     //比例尺
     var yLiner = d3.scaleLinear()
       .domain([min > 0 ? 0 : min, max])
-      .range([screen.height, 0]);
+      .range([height, 0]);
     var xLiner = d3.scaleBand()
       .domain(data.map((d, i) => 'No.' + i))
-      .range([0, screen.width]);
+      .range([0, width]);
 
     //建立svg及設定大小
     var svg = d3.select('body')
       .append('svg')
-      .attr('width', (data.length) * barWidth + screen.padding * 2)
-      .attr('height', yLiner(min) + screen.padding * 2);
+      .attr('width', width + margin * 2)
+      .attr('height', height + margin * 2);
+
+    var g = svg.append('g')
+      .attr('transform', `translate(${margin},${margin})`);
 
     //繪製長條圖
-    svg.selectAll('rect').data(data).enter()
+    g.selectAll('rect').data(data).enter()
       .append('rect')
-      .attr('x', (d, i) => i * barWidth + screen.padding + screen.innterPadding)
-      .attr('y', (d) => yLiner(0) + screen.padding)
+      .attr('x', (d, i) => i * barWidth)
+      .attr('y', (d) => yLiner(0))
       .attr('width', d => barWidth - 3)
       .style('fill', d => d < 0 ? 'red' : '#CCC')
       .transition()
       .duration(1500)
       .attr('height', d => Math.abs(yLiner(d) - yLiner(0)))
-      .attr('y', (d) => yLiner(d) + (d > 0 ? screen.padding : -screen.padding));
+      .attr('y', (d) => yLiner(d) - (d > 0 ? 0 : Math.abs(yLiner(d) - yLiner(0))));
 
     //加上Value的文字
-    svg.selectAll('text').data(data).enter().append('text')
+    g.selectAll('text').data(data).enter().append('text')
       .text(a => a)
-      .attr('x', (d, i) => i * barWidth + screen.padding + screen.innterPadding)
+      .attr('x', (d, i) => i * barWidth)
       .attr("dy", "1em")
       .attr("dx", xLiner.bandwidth() / 2)
       .attr("text-anchor", "middle")
-      .attr('y', (d) => yLiner(0) + screen.padding)
+      .attr('y', (d) => yLiner(0))
       .transition()
       .duration(1500)
-      .attr('y', d => yLiner(d) + (d > 0 ? screen.padding : 0));
+      .attr('y', d => yLiner(d) -20);
 
     //軸線
-    svg.append('g').attr("transform", "translate(" + screen.padding + "," + screen.padding + ")")
-      .call(d3.axisLeft(yLiner)); //注意Y軸反轉
-    svg.append('g').attr("transform", "translate(" + (screen.padding + screen.innterPadding) + "," + (screen.height + screen.padding + screen.innterPadding) + ")")
+    g.append('g').attr("transform", "translate(0,0)")
+      .call(d3.axisLeft(yLiner)); 
+    g.append('g').attr("transform", `translate(0, ${height})`)
       .call(d3.axisBottom(xLiner));
 
   </script>
