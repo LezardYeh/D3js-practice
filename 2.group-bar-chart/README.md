@@ -6,7 +6,7 @@
 - 群組比例尺應用
 - 條圖數值置中顯示
 - 自動配色
-- [DEMO](https://htmlpreview.github.io/?https://github.com/LezardYeh/D3js-practice/blob/master/2.group-bar-chart/index.html)
+- [DEMO](https://htmlpreview.github.io/?https://github.com/LezardYeh/D3js-practice/blob/master/2.group-bar-chart/index.html){:target="_blank"}
 
 # 待改進
 - 0 和 負值 未處理
