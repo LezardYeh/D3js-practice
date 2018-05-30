@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>JS Bin</title>
+</head>
+
+<body>
+  <svg></svg>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+
+  <script>
+    var data = d3.range(1, 11);
+    margin = 40,
+      width = 500,
+      height = 300,
+      barWidth = width / data.length,
+      max = d3.max(data),
+      min = d3.min(data);
+
+    paintChart();
+    setInterval(function () {
+      paintChart();
+    }, 3000)
+
+    function paintChart() {
+
+      data = d3.shuffle(data);
+      console.log(data);
+      var yLiner = d3.scaleLinear()
+        .domain([min > 0 ? 0 : min, max])
+        .range([height, 0]);
+      var xLiner = d3.scaleBand()
+        .domain(data.map((d, i) => 'No.' + i))
+        .range([0, width]);
+
+      //建立svg及設定大小
+      var svg = d3.select('body')
+        .selectAll('svg')
+        .attr('width', width + margin * 2)
+        .attr('height', height + margin * 2);
+
+
+      var g = svg.select('g');
+      if (g.empty())
+        g = svg.append('g');
+      g.attr('transform', `translate(${margin},${margin})`);
+
+      //繪製長條圖
+      var barUpdate = g.selectAll('rect').data(data);
+      barUpdate.transition()
+        .attr('height', 0)
+        .attr('y', (d) => yLiner(0))
+        .duration(1000)
+        .attr('height', d => Math.abs(yLiner(d) - yLiner(0)))
+        .attr('y', (d) => yLiner(d) - (d > 0 ? 0 : Math.abs(yLiner(d) - yLiner(0)))
+        )
+
+      barUpdate.enter()
+        .append('rect')
+        .attr('x', (d, i) => i * barWidth)
+        .attr('y', (d) => yLiner(0))
+        .attr('width', d => barWidth - 3)
+        .style('fill', d => d < 0 ? 'red' : '#CCC')
+        .transition()
+        .duration(1000)
+        .attr('height', d => Math.abs(yLiner(d) - yLiner(0)))
+        .attr('y', (d) => yLiner(d) - (d > 0 ? 0 : Math.abs(yLiner(d) - yLiner(0))));
+
+      //加上Value的文字
+      var textUpdate = g.selectAll('text').data(data);
+      textUpdate.transition().duration(1000)
+        .attr('y', d => yLiner(d) - 20)
+        .text(d => d);
+      textUpdate.enter().append('text')
+        .text(a => a)
+        .attr('x', (d, i) => i * barWidth)
+        .attr("dy", "1em")
+        .attr("dx", xLiner.bandwidth() / 2)
+        .attr("text-anchor", "middle")
+        .attr('y', (d) => yLiner(0))
+        .transition()
+        .duration(1500)
+        .attr('y', d => yLiner(d) - 20);
+
+      //軸線
+      g.append('g').attr("transform", "translate(0,0)")
+        .call(d3.axisLeft(yLiner));
+      g.append('g').attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(xLiner));
+    }
+  </script>
+</body>
+
+</html>
